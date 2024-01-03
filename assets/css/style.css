@@ -3,22 +3,26 @@
   --forecast-color: #fff;
 }
 
-/* .bg-primary {
-    background-color: #404DA8;
-  } */
+.header {
+  background-color: #404DA8;
+  color: white;
+}
 
-  .header {
-    background-color: #404DA8;
-    color: white;
-  }
-  .btn-primary{
-    background-color: #6991E3;
-  }
-  .card-title{
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-.card-forecast{
+.btn-primary {
+  background-color: #6991E3;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+h5 {
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+.card-forecast {
   font-size: 1.1rem;
   background-color: var(--forecast-background);
   color: var(--forecast-color);

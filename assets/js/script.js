@@ -75,7 +75,6 @@ let addCardItem = function (parentItem, name, data, isCurrent) {
 
     let currWeatherCardText1 = $('<p>');
     currWeatherCardText1.addClass('card-text');
-    console.log(data);
     let temp = `Temp: ${data.main.temp}\u00B0F`;
     currWeatherCardText1.text(temp);
     currWeatherCardBody.append(currWeatherCardText1);
@@ -109,6 +108,7 @@ let addCurrentWeather = function (name, data) {
     weatherGroup = $('<div>');
     weatherGroup.addClass('list-group');
     weatherGroup.addClass('list-group-horizontal');
+    weatherGroup.addClass('justify-content-between');
     rootEl.append(weatherGroup);
 }
 
