@@ -75,7 +75,9 @@ let addCardItem = function (parentItem, name, data, isCurrent) {
 
     let currWeatherCardText1 = $('<p>');
     currWeatherCardText1.addClass('card-text');
-    currWeatherCardText1.text(`Temp: ${data.main.temp_kf}F`);
+    console.log(data);
+    let temp = `Temp: ${data.main.temp}\u00B0F`;
+    currWeatherCardText1.text(temp);
     currWeatherCardBody.append(currWeatherCardText1);
 
     let currWeatherCardText2 = $('<p>');
@@ -147,7 +149,7 @@ function updateWeather(url) {
             if (data && data.length > 0) {
                 lat = data[0].lat.toFixed(2);
                 lon = data[0].lon.toFixed(2);
-                return `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+                return `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
             }
         })
         .then(function (url) {
