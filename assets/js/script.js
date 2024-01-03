@@ -53,7 +53,7 @@ let addCardItem = function (parentItem, name, data, isCurrent) {
     let currWeatherCardTitle = $('<h5>');
     currWeatherCardTitle.addClass('card-title');
     let iconcode = data.weather.length > 0 ? data.weather[0].icon : 0;
-    let iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
+    let iconurl = "https://openweathermap.org/img/w/" + iconcode + ".png";
     let currWeatherCardIconDiv = $('<div>');
     let currWeatherCardIcon = $('<img>');
     currWeatherCardIcon.attr('src', iconurl);
@@ -165,7 +165,7 @@ let getWeather = function (name) {
         return; 
     }
     cityName = name;
-    let cityConvert = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=${5}&appid=${apiKey}`;
+    let cityConvert = `https://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=${5}&appid=${apiKey}`;
     storeCity();
     updateWeather(cityConvert);
 }
