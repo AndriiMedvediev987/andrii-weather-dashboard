@@ -1,12 +1,45 @@
-//51cd3f5cfa98adb5d8333005566e3035
 let apiKey = "51cd3f5cfa98adb5d8333005566e3035";
 let inputCityEl = $('#inputCity');
 let submitFormEL = $('#whether-form');
 let cityNameEL = $('#inputCity');
-let rootEl = $('#weather-row');
+let rootEl = $('#weather-card');
+let cityListEl = $('#city-list');
 let weatherCard;
 let weatherGroup;
-let addCardItem = function(parentItem, name, data, isCurrent){
+let cityName;
+let cities = 'cities';
+let cityNameClass = 'city-name';
+let cityNames = [];
+
+//storage section
+let initStorage = function () {
+    cityNames = JSON.parse(localStorage.getItem(cities)) || [];
+}
+
+let storeCity = function () {
+    if (cityName && !cityNames.includes(cityName)) {
+        cityNames.push(cityName);
+        localStorage.setItem(cities, JSON.stringify(cityNames));
+    }
+    renderCityNames();
+}
+
+let renderCityNames = function () {
+    cityListEl.empty();
+    for (let i = 0; i < cityNames.length; i++) {
+        let cityName = $('<button>');
+        cityName.attr('type', 'button');
+        cityName.addClass('btn');
+        cityName.addClass('btn-secondary');
+        cityName.addClass('city-name');
+        cityName.text(cityNames[i]);
+        cityListEl.append(cityName);
+    }
+}
+
+//weather section
+let addCardItem = function (parentItem, name, data, isCurrent) {
+
     let today = dayjs(data.dt_txt);
     const currentDate = today.format('DD/MM/YYYY');
 
@@ -19,13 +52,26 @@ let addCardItem = function(parentItem, name, data, isCurrent){
 
     let currWeatherCardTitle = $('<h5>');
     currWeatherCardTitle.addClass('card-title');
-    if (isCurrent){
+    let iconcode = data.weather.length > 0 ? data.weather[0].icon : 0;
+    let iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
+    let currWeatherCardIconDiv = $('<div>');
+    let currWeatherCardIcon = $('<img>');
+    currWeatherCardIcon.attr('src', iconurl);
+    currWeatherCardIconDiv.append(currWeatherCardIconDiv);
+
+    if (isCurrent) {
         currWeatherCardTitle.text(`${name} (${currentDate}) `);
+        currWeatherCardTitle.append(currWeatherCardIcon);
     }
-    else{
+    else {
+        currWeatherCardTitle.addClass('card-forecast');
         currWeatherCardTitle.text(`${currentDate}`);
+        currWeatherCardBody.addClass('card-forecast');
     }
     currWeatherCardBody.append(currWeatherCardTitle);
+    if (!isCurrent) {
+        currWeatherCardBody.append(currWeatherCardIcon);
+    }
 
     let currWeatherCardText1 = $('<p>');
     currWeatherCardText1.addClass('card-text');
@@ -47,38 +93,31 @@ let addCardItem = function(parentItem, name, data, isCurrent){
     parentItem.append(currWeatherCard);
 }
 
-let addCurrentWeather = function(name, data){
-    console.log(data);
+let addCurrentWeather = function (name, data) {
     let today = dayjs(data.dt_txt);
-    //dayjs.duration(data.dt, 'minutes').
     const currentDate = today.format('DD/MM/YYYY');
-    // console.log(finalTime);
-    // console.log(data.dt.format('MMM D, YYYY'));
-    let weatherCard = $('<div>');
-    weatherCard.addClass('col');
 
-    addCardItem(weatherCard, name, data, true);
+    addCardItem(rootEl, name, data, true);
 
     let weatherForecastTitle = $('<h5>');
     weatherForecastTitle.addClass('m-2');
 
     weatherForecastTitle.text(`5-Day Forecast:`);
-    weatherCard.append(weatherForecastTitle);
+    rootEl.append(weatherForecastTitle);
     weatherGroup = $('<div>');
     weatherGroup.addClass('list-group');
     weatherGroup.addClass('list-group-horizontal');
-
-    weatherCard.append(weatherGroup);
-
-    rootEl.append(weatherCard);
-
+    rootEl.append(weatherGroup);
 }
+
 let fillForecast = function (data) {
-    console.log(data);
     addCardItem(weatherGroup, '', data, false);
-        // var waetherEl = $('<li>');
-
 }
+
+let clearWeatherCard = function () {
+    rootEl.empty();
+}
+
 let getApi = function (url) {
     fetch(url).then(function (response) {
         if (response.status === 200) {
@@ -87,8 +126,7 @@ let getApi = function (url) {
     })
         .then(function (data) {
             if (data) {
-                console.log(data);
-                addCurrentWeather(data.city.name, data.list[0]);
+                addCurrentWeather(cityName, data.list[0]);
 
                 for (let i = 1; i < 6; i++) {
                     fillForecast(data.list[i]);
@@ -99,7 +137,7 @@ let getApi = function (url) {
 
 let lat;
 let lon;
-function getLatitude(url) {
+function updateWeather(url) {
     fetch(url).then(function (response) {
         if (response.status === 200) {
         }
@@ -112,14 +150,34 @@ function getLatitude(url) {
                 return `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`;
             }
         })
-        .then(function (url1) {
-            getApi(url1);
+        .then(function (url) {
+            getApi(url);
         });
 }
-async function handleWeatherSubmit(event) {
-    event.preventDefault();
-    let cityName = cityNameEL.val();
+
+// submit section
+let getWeather = function (name) {
+    clearWeatherCard();
+
+    if (!name) {
+        return; 
+    }
+    cityName = name;
     let cityConvert = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=${5}&appid=${apiKey}`;
-    getLatitude(cityConvert);
+    storeCity();
+    updateWeather(cityConvert);
 }
+function getWeatherFromButton(event) {
+    event.preventDefault();
+    getWeather($(event.currentTarget).text());
+}
+
+function handleWeatherSubmit(event) {
+    event.preventDefault();
+    getWeather(cityNameEL.val());
+    cityNameEL.val('');
+}
+
 submitFormEL.on('submit', handleWeatherSubmit);
+cityListEl.on('click', `.${cityNameClass}`, getWeatherFromButton);
+initStorage();
